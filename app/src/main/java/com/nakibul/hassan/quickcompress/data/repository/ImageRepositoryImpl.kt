@@ -1,12 +1,9 @@
 package com.nakibul.hassan.quickcompress.data.repository
 
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import com.nakibul.hassan.quickcompress.domain.model.CompressedImage
 import com.nakibul.hassan.quickcompress.domain.model.CompressionSettings
 import com.nakibul.hassan.quickcompress.domain.model.ImageItem
@@ -16,7 +13,6 @@ import com.nakibul.hassan.quickcompress.utils.ImageUtils
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
 import java.io.File
-import java.io.FileInputStream
 import javax.inject.Inject
 
 class ImageRepositoryImpl @Inject constructor(
@@ -97,55 +93,45 @@ class ImageRepositoryImpl @Inject constructor(
         val sourceFile = File(compressedUri.path!!)
         if (!sourceFile.exists()) {
             Timber.e("Source file does not exist: ${sourceFile.absolutePath}")
-            throw IllegalStateException("Compressed file not found")
+            throw IllegalStateException("Compressed file not found: ${sourceFile.absolutePath}")
         }
         
-        // Use MediaStore to save to Pictures/QuickCompress folder
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, FileUtils.generateUniqueFileName(displayName))
-            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                // For Android 10+, use relative path
-                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/QuickCompress")
-                put(MediaStore.Images.Media.IS_PENDING, 1)
-            }
+        // Get output directory
+        val outputDir = FileUtils.getCompressedImagesDir(context)
+        
+        // Validate directory exists and is writable
+        if (!outputDir.exists()) {
+            Timber.e("Output directory does not exist: ${outputDir.absolutePath}")
+            throw IllegalStateException("Failed to create output directory: ${outputDir.absolutePath}")
         }
         
-        val contentResolver = context.contentResolver
-        val imageUri = contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        ) ?: throw IllegalStateException("Failed to create MediaStore entry")
+        if (!outputDir.canWrite()) {
+            Timber.e("Output directory is not writable: ${outputDir.absolutePath}")
+            throw IllegalStateException("Cannot write to directory: ${outputDir.absolutePath}")
+        }
         
-        Timber.d("MediaStore URI created: $imageUri")
+        val fileName = FileUtils.generateUniqueFileName(displayName)
+        val outputFile = File(outputDir, fileName)
+        
+        Timber.d("Saving to: ${outputFile.absolutePath}")
         
         try {
-            // Copy file to MediaStore URI
-            contentResolver.openOutputStream(imageUri)?.use { outputStream ->
-                FileInputStream(sourceFile).use { inputStream ->
-                    inputStream.copyTo(outputStream)
-                }
+            // Copy file to destination
+            sourceFile.copyTo(outputFile, overwrite = true)
+            
+            if (!outputFile.exists() || outputFile.length() == 0L) {
+                throw IllegalStateException("File copy failed or resulted in empty file")
             }
             
-            // Mark as complete (Android 10+)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                contentValues.clear()
-                contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
-                contentResolver.update(imageUri, contentValues, null, null)
-            }
-            
-            Timber.d("Image saved successfully to MediaStore")
+            Timber.d("Image saved successfully. Size: ${outputFile.length()} bytes")
             
             // Clean up temp file
             sourceFile.delete()
             
-            return imageUri
+            return Uri.fromFile(outputFile)
         } catch (e: Exception) {
-            // If save fails, delete the MediaStore entry
-            contentResolver.delete(imageUri, null, null)
-            Timber.e(e, "Failed to save image to MediaStore")
-            throw e
+            Timber.e(e, "Failed to save image: ${e.message}")
+            throw IllegalStateException("Failed to save compressed image: ${e.message}", e)
         }
     }
     

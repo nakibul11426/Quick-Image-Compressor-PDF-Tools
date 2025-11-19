@@ -84,9 +84,13 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
         
-        // Image to PDF Flow
-        composable(Screen.ImageToPdfPicker.route) {
+        // Image to PDF Flow - Share ViewModel across both screens
+        composable(Screen.ImageToPdfPicker.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.ImageToPdfPicker.route)
+            }
             ImageToPdfPickerScreen(
+                viewModel = hiltViewModel(parentEntry),
                 onNavigateToOrder = {
                     navController.navigate(Screen.ImageToPdfPreview.route)
                 },
@@ -96,8 +100,12 @@ fun AppNavigation(navController: NavHostController) {
             )
         }
         
-        composable(Screen.ImageToPdfPreview.route) {
+        composable(Screen.ImageToPdfPreview.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.ImageToPdfPicker.route)
+            }
             ImageToPdfPreviewScreen(
+                viewModel = hiltViewModel(parentEntry),
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }

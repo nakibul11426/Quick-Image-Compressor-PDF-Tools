@@ -107,7 +107,7 @@ fun CompressionResultScreen(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Location: Pictures/QuickCompress/Compressed/",
+                                text = "Location: Documents/QuickCompress/CompressedImages/",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
                             )

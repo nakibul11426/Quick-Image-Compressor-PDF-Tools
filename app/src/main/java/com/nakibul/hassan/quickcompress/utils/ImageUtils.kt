@@ -167,11 +167,53 @@ object ImageUtils {
     
     fun getBitmapFromUri(context: Context, uri: Uri): Bitmap? {
         return try {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)
+            Timber.d("getBitmapFromUri: Loading $uri")
+            
+            // First pass: Get dimensions without loading full image
+            var width = 0
+            var height = 0
+            
+            context.contentResolver.openInputStream(uri)?.use { stream ->
+                val options = BitmapFactory.Options().apply {
+                    inJustDecodeBounds = true
+                }
+                BitmapFactory.decodeStream(stream, null, options)
+                width = options.outWidth
+                height = options.outHeight
             }
+            
+            if (width <= 0 || height <= 0) {
+                Timber.e("getBitmapFromUri: Invalid dimensions for $uri")
+                return null
+            }
+            
+            Timber.d("getBitmapFromUri: Image dimensions: ${width}x${height}")
+            
+            // Calculate sample size for memory efficiency
+            // Use max 2048 as reasonable size for PDF creation
+            val maxDimension = 2048
+            val sampleSize = calculateInSampleSize(width, height, maxDimension, maxDimension)
+            
+            Timber.d("getBitmapFromUri: Using inSampleSize=$sampleSize")
+            
+            // Second pass: Decode with sample size
+            val bitmap = context.contentResolver.openInputStream(uri)?.use { stream ->
+                val options = BitmapFactory.Options().apply {
+                    inSampleSize = sampleSize
+                    inPreferredConfig = Bitmap.Config.ARGB_8888
+                }
+                BitmapFactory.decodeStream(stream, null, options)
+            }
+            
+            if (bitmap == null) {
+                Timber.e("getBitmapFromUri: Failed to decode bitmap from $uri")
+                return null
+            }
+            
+            Timber.d("getBitmapFromUri: Successfully loaded bitmap ${bitmap.width}x${bitmap.height}")
+            bitmap
         } catch (e: Exception) {
-            Timber.e(e, "Error loading bitmap from URI")
+            Timber.e(e, "Error loading bitmap from URI: $uri")
             null
         }
     }

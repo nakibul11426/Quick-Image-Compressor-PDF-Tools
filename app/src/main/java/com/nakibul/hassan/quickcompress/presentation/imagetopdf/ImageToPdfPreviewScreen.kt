@@ -22,7 +22,7 @@ import com.nakibul.hassan.quickcompress.presentation.components.TopBar
 
 @Composable
 fun ImageToPdfPreviewScreen(
-    viewModel: ImageToPdfViewModel = hiltViewModel(),
+    viewModel: ImageToPdfViewModel,
     onNavigateToHome: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -56,34 +56,7 @@ fun ImageToPdfPreviewScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when (uiState) {
-                is ImageToPdfUiState.Creating -> {
-                    LoadingDialog(message = "Creating PDF...")
-                }
-                is ImageToPdfUiState.Error -> {
-                    val error = (uiState as ImageToPdfUiState.Error).message
-                    ErrorDialog(
-                        message = error,
-                        onDismiss = { viewModel.reset() }
-                    )
-                }
-                else -> {
-                    // Show content
-                }
-            }
-            
-            if (showSuccessDialog && createdPdfUri != null) {
-                SuccessDialog(
-                    title = "PDF Created",
-                    message = "Your PDF has been created successfully!",
-                    onDismiss = {
-                        showSuccessDialog = false
-                        viewModel.reset()
-                        onNavigateToHome()
-                    }
-                )
-            }
-            
+            // Always show content
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -199,6 +172,32 @@ fun ImageToPdfPreviewScreen(
                     enabled = fileName.isNotBlank()
                 )
             }
+            
+            // Show dialogs as overlays
+            if (uiState is ImageToPdfUiState.Creating) {
+                LoadingDialog(message = "Creating PDF...")
+            }
+            
+            if (uiState is ImageToPdfUiState.Error) {
+                val error = (uiState as ImageToPdfUiState.Error).message
+                ErrorDialog(
+                    message = error,
+                    onDismiss = { viewModel.reset() }
+                )
+            }
+            
+            if (showSuccessDialog && createdPdfUri != null) {
+                SuccessDialog(
+                    title = "PDF Created",
+                    message = "Your PDF has been created successfully!",
+                    onDismiss = {
+                        showSuccessDialog = false
+                        viewModel.reset()
+                        onNavigateToHome()
+                    }
+                )
+            }
+
         }
     }
 }

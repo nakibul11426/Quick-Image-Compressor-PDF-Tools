@@ -22,9 +22,14 @@ object PdfUtils {
         pdfSettings: PdfSettings
     ): Boolean {
         return try {
+            Timber.d("createPdfFromImages: Creating PDF with ${imageBitmaps.size} images")
+            Timber.d("createPdfFromImages: Output file: ${outputFile.absolutePath}")
+            Timber.d("createPdfFromImages: PDF settings: $pdfSettings")
+            
             val pdfDocument = PdfDocument()
             
             imageBitmaps.forEachIndexed { index, bitmap ->
+                Timber.d("createPdfFromImages: Processing page ${index + 1}: ${bitmap.width}x${bitmap.height}")
                 val pageInfo = createPageInfo(index, bitmap, pdfSettings)
                 val page = pdfDocument.startPage(pageInfo)
                 
@@ -38,6 +43,9 @@ object PdfUtils {
             }
             
             pdfDocument.close()
+            
+            val fileSize = outputFile.length()
+            Timber.d("createPdfFromImages: PDF created successfully, size: $fileSize bytes")
             true
         } catch (e: Exception) {
             Timber.e(e, "Error creating PDF from images")

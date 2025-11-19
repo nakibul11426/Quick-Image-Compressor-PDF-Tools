@@ -24,7 +24,7 @@ import com.nakibul.hassan.quickcompress.presentation.components.TopBar
 
 @Composable
 fun ImageToPdfPickerScreen(
-    viewModel: ImageToPdfViewModel = hiltViewModel(),
+    viewModel: ImageToPdfViewModel,
     onNavigateToOrder: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -35,7 +35,11 @@ fun ImageToPdfPickerScreen(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris: List<Uri> ->
         if (uris.isNotEmpty()) {
-            viewModel.onImagesSelected(uris)
+            if (selectedImages.isEmpty()) {
+                viewModel.onImagesSelected(uris)
+            } else {
+                viewModel.addMoreImages(uris)
+            }
         }
     }
     
@@ -79,6 +83,12 @@ fun ImageToPdfPickerScreen(
                     text = "Choose images to convert to PDF",
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onBackground
+                )
+                
+                Text(
+                    text = "Select one or multiple images. All selected images will be combined into a single PDF file.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 if (selectedImages.isEmpty()) {

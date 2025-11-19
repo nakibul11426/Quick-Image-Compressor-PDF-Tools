@@ -42,6 +42,22 @@ class ImageToPdfViewModel @Inject constructor(
         }
     }
     
+    fun addMoreImages(uris: List<Uri>) {
+        viewModelScope.launch {
+            try {
+                _uiState.value = ImageToPdfUiState.Loading
+                val newImages = getImageDetailsUseCase(uris)
+                val currentImages = _selectedImages.value.toMutableList()
+                currentImages.addAll(newImages)
+                _selectedImages.value = currentImages
+                _uiState.value = ImageToPdfUiState.ImagesSelected(currentImages)
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading images")
+                _uiState.value = ImageToPdfUiState.Error(e.message ?: "Failed to load images")
+            }
+        }
+    }
+    
     fun reorderImages(fromIndex: Int, toIndex: Int) {
         val currentList = _selectedImages.value.toMutableList()
         val item = currentList.removeAt(fromIndex)
@@ -68,12 +84,26 @@ class ImageToPdfViewModel @Inject constructor(
             try {
                 _uiState.value = ImageToPdfUiState.Creating
                 
+                val startTime = System.currentTimeMillis()
+                
                 val imageUris = _selectedImages.value.map { it.uri }
+                Timber.d("createPdf: Creating PDF from ${imageUris.size} images")
+                Timber.d("createPdf: Output filename: $fileName")
+                
                 val pdfUri = createPdfFromImagesUseCase(
                     imageUris,
                     _pdfSettings.value,
                     fileName
                 )
+                
+                Timber.d("createPdf: PDF created at: $pdfUri")
+                
+                // Ensure minimum display time of 1 second for loading indicator
+                val elapsedTime = System.currentTimeMillis() - startTime
+                val remainingTime = 1000 - elapsedTime
+                if (remainingTime > 0) {
+                    kotlinx.coroutines.delay(remainingTime)
+                }
                 
                 _uiState.value = ImageToPdfUiState.PdfCreated(pdfUri)
             } catch (e: Exception) {

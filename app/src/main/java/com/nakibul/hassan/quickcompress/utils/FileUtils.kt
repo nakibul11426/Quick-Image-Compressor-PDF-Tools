@@ -85,28 +85,57 @@ object FileUtils {
     }
     
     fun getAppStorageDir(context: Context): File {
-        // Use app-specific directory for internal files like PDFs
-        val dir = File(context.getExternalFilesDir(null), "QuickCompress")
+        // Use external storage public directory
+        val storageDir = android.os.Environment.getExternalStoragePublicDirectory(
+            android.os.Environment.DIRECTORY_DOCUMENTS
+        )
+        val dir = File(storageDir, "QuickCompress")
         if (!dir.exists()) {
-            dir.mkdirs()
+            val created = dir.mkdirs()
+            Timber.d("Created QuickCompress directory: $created at ${dir.absolutePath}")
         }
         return dir
     }
     
     fun getCompressedImagesDir(context: Context): File {
-        // This is now only used for temporary storage during compression
-        // Final images are saved via MediaStore
-        val dir = File(context.cacheDir, "compressed_temp")
+        val baseDir = getAppStorageDir(context)
+        val dir = File(baseDir, "CompressedImages")
         if (!dir.exists()) {
-            dir.mkdirs()
+            val created = dir.mkdirs()
+            Timber.d("Created CompressedImages directory: $created at ${dir.absolutePath}")
+            if (!created) {
+                Timber.e("Failed to create directory: ${dir.absolutePath}")
+            }
         }
         return dir
     }
     
     fun getPdfsDir(context: Context): File {
-        val dir = File(getAppStorageDir(context), "PDFs")
+        val baseDir = getAppStorageDir(context)
+        val dir = File(baseDir, "CreatedPDFs")
         if (!dir.exists()) {
-            dir.mkdirs()
+            val created = dir.mkdirs()
+            Timber.d("Created CreatedPDFs directory: $created at ${dir.absolutePath}")
+        }
+        return dir
+    }
+    
+    fun getMergedPdfsDir(context: Context): File {
+        val baseDir = getAppStorageDir(context)
+        val dir = File(baseDir, "MergedPDFs")
+        if (!dir.exists()) {
+            val created = dir.mkdirs()
+            Timber.d("Created MergedPDFs directory: $created at ${dir.absolutePath}")
+        }
+        return dir
+    }
+    
+    fun getSplitPdfsDir(context: Context): File {
+        val baseDir = getAppStorageDir(context)
+        val dir = File(baseDir, "SplitPDFs")
+        if (!dir.exists()) {
+            val created = dir.mkdirs()
+            Timber.d("Created SplitPDFs directory: $created at ${dir.absolutePath}")
         }
         return dir
     }

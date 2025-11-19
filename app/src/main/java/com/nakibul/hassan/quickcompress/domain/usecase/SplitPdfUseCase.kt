@@ -2,6 +2,8 @@ package com.nakibul.hassan.quickcompress.domain.usecase
 
 import android.net.Uri
 import com.nakibul.hassan.quickcompress.domain.repository.PdfRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SplitPdfUseCase @Inject constructor(
@@ -11,7 +13,7 @@ class SplitPdfUseCase @Inject constructor(
         pdfUri: Uri,
         pageRanges: List<IntRange>,
         outputFilePrefix: String
-    ): List<Uri> {
-        return pdfRepository.splitPdf(pdfUri, pageRanges, outputFilePrefix)
+    ): List<Uri> = withContext(Dispatchers.IO) {
+        return@withContext pdfRepository.splitPdf(pdfUri, pageRanges, outputFilePrefix)
     }
 }
