@@ -1,0 +1,16 @@
+package com.nakibul.hassan.quickcompress.presentation.navigation
+
+sealed class Screen(val route: String) {
+    object Home : Screen("home")
+    
+    object CompressorPicker : Screen("compressor/picker")
+    object CompressorOptions : Screen("compressor/options")
+    object CompressorResult : Screen("compressor/result")
+    
+    object ImageToPdfPicker : Screen("imagetopdf/picker")
+    object ImageToPdfPreview : Screen("imagetopdf/preview")
+    
+    object PdfMerge : Screen("pdfmerge")
+    
+    object PdfSplit : Screen("pdfsplit")
+}
