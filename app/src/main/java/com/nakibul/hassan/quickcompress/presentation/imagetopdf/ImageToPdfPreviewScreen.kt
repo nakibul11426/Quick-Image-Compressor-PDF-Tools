@@ -98,7 +98,8 @@ fun ImageToPdfPreviewScreen(
                         PageSize.entries.forEach { size ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
                                     selected = selectedPageSize == size,
@@ -107,7 +108,7 @@ fun ImageToPdfPreviewScreen(
                                 Text(
                                     text = size.displayName,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -127,7 +128,8 @@ fun ImageToPdfPreviewScreen(
                         MarginOption.entries.forEach { margin ->
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
                                     selected = selectedMargin == margin,
@@ -136,7 +138,7 @@ fun ImageToPdfPreviewScreen(
                                 Text(
                                     text = margin.displayName,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.align(Alignment.CenterVertically)
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }

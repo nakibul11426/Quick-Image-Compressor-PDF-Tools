@@ -4,6 +4,8 @@ import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -25,11 +27,23 @@ fun RoundedCard(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
+    val borderModifier = if (!isDarkTheme) {
+        Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+            shape = MaterialTheme.shapes.extraLarge
+        )
+    } else {
+        Modifier
+    }
+    
     if (onClick != null) {
         Card(
             onClick = onClick,
             modifier = modifier
                 .fillMaxWidth()
+                .then(borderModifier)
                 .animateContentSize(
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -54,6 +68,7 @@ fun RoundedCard(
         Card(
             modifier = modifier
                 .fillMaxWidth()
+                .then(borderModifier)
                 .animateContentSize(),
             shape = MaterialTheme.shapes.extraLarge,
             colors = CardDefaults.cardColors(
@@ -79,10 +94,22 @@ fun ToolCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
+    val borderModifier = if (!isDarkTheme) {
+        Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+            shape = MaterialTheme.shapes.extraLarge
+        )
+    } else {
+        Modifier
+    }
+    
     Card(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
+            .then(borderModifier)
             .animateContentSize(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
