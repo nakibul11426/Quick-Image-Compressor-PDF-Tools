@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
     
     object ImageToPdfPicker : Screen("imagetopdf/picker")
     object ImageToPdfPreview : Screen("imagetopdf/preview")
+    object ImageToPdfResult : Screen("imagetopdf/result")
     
     object PdfMerge : Screen("pdfmerge")
     

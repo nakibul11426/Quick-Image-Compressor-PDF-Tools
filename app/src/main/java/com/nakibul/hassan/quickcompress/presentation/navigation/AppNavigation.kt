@@ -12,6 +12,7 @@ import com.nakibul.hassan.quickcompress.presentation.compressor.CompressionResul
 import com.nakibul.hassan.quickcompress.presentation.home.HomeScreen
 import com.nakibul.hassan.quickcompress.presentation.imagetopdf.ImageToPdfPickerScreen
 import com.nakibul.hassan.quickcompress.presentation.imagetopdf.ImageToPdfPreviewScreen
+import com.nakibul.hassan.quickcompress.presentation.imagetopdf.PdfResultScreen
 import com.nakibul.hassan.quickcompress.presentation.pdfmerge.PdfMergeScreen
 import com.nakibul.hassan.quickcompress.presentation.pdfsplit.PdfSplitScreen
 
@@ -106,13 +107,25 @@ fun AppNavigation(navController: NavHostController) {
             }
             ImageToPdfPreviewScreen(
                 viewModel = hiltViewModel(parentEntry),
+                onNavigateToResult = {
+                    navController.navigate(Screen.ImageToPdfResult.route)
+                },
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(Screen.ImageToPdfResult.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.ImageToPdfPicker.route)
+            }
+            PdfResultScreen(
+                viewModel = hiltViewModel(parentEntry),
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
-                },
-                onNavigateBack = {
-                    navController.popBackStack()
                 }
             )
         }

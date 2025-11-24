@@ -26,15 +26,29 @@ object PdfUtils {
             Timber.d("createPdfFromImages: Output file: ${outputFile.absolutePath}")
             Timber.d("createPdfFromImages: PDF settings: $pdfSettings")
             
+            if (imageBitmaps.isEmpty()) {
+                Timber.e("createPdfFromImages: No images to create PDF")
+                return false
+            }
+            
+            // Calculate uniform page size for all images
+            val uniformPageSize = calculateUniformPageSize(imageBitmaps, pdfSettings)
+            Timber.d("createPdfFromImages: Using uniform page size: ${uniformPageSize.width}x${uniformPageSize.height}")
+            
             val pdfDocument = PdfDocument()
             
             imageBitmaps.forEachIndexed { index, bitmap ->
                 Timber.d("createPdfFromImages: Processing page ${index + 1}: ${bitmap.width}x${bitmap.height}")
-                val pageInfo = createPageInfo(index, bitmap, pdfSettings)
+                
+                // Use uniform page size for all pages
+                val pageInfo = PdfDocument.PageInfo.Builder(
+                    uniformPageSize.width,
+                    uniformPageSize.height,
+                    index + 1
+                ).create()
+                
                 val page = pdfDocument.startPage(pageInfo)
-                
                 drawBitmapOnPage(page.canvas, bitmap, pdfSettings)
-                
                 pdfDocument.finishPage(page)
             }
             
@@ -53,26 +67,30 @@ object PdfUtils {
         }
     }
     
-    private fun createPageInfo(
-        pageNumber: Int,
-        bitmap: Bitmap,
+    private data class PageDimensions(val width: Int, val height: Int)
+    
+    private fun calculateUniformPageSize(
+        imageBitmaps: List<Bitmap>,
         pdfSettings: PdfSettings
-    ): PdfDocument.PageInfo {
-        val width: Int
-        val height: Int
-        
-        when (pdfSettings.pageSize) {
+    ): PageDimensions {
+        return when (pdfSettings.pageSize) {
             PageSize.FIT_TO_IMAGE -> {
-                width = bitmap.width
-                height = bitmap.height
+                // Find the maximum dimensions from all images to create uniform pages
+                val maxWidth = imageBitmaps.maxOf { it.width }
+                val maxHeight = imageBitmaps.maxOf { it.height }
+                
+                // Use the largest dimensions, maintaining a reasonable aspect ratio
+                // This ensures all images fit without distortion
+                PageDimensions(maxWidth, maxHeight)
             }
             else -> {
-                width = pdfSettings.pageSize.widthPx
-                height = pdfSettings.pageSize.heightPx
+                // Use standard page size for all pages
+                PageDimensions(
+                    pdfSettings.pageSize.widthPx,
+                    pdfSettings.pageSize.heightPx
+                )
             }
         }
-        
-        return PdfDocument.PageInfo.Builder(width, height, pageNumber + 1).create()
     }
     
     private fun drawBitmapOnPage(

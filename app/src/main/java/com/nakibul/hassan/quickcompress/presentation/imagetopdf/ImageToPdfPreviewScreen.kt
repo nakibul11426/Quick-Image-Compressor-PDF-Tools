@@ -1,6 +1,5 @@
 package com.nakibul.hassan.quickcompress.presentation.imagetopdf
 
-import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -9,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.nakibul.hassan.quickcompress.domain.model.MarginOption
 import com.nakibul.hassan.quickcompress.domain.model.PageSize
 import com.nakibul.hassan.quickcompress.domain.model.PdfSettings
@@ -17,13 +15,12 @@ import com.nakibul.hassan.quickcompress.presentation.components.ErrorDialog
 import com.nakibul.hassan.quickcompress.presentation.components.LoadingDialog
 import com.nakibul.hassan.quickcompress.presentation.components.PrimaryButton
 import com.nakibul.hassan.quickcompress.presentation.components.RoundedCard
-import com.nakibul.hassan.quickcompress.presentation.components.SuccessDialog
 import com.nakibul.hassan.quickcompress.presentation.components.TopBar
 
 @Composable
 fun ImageToPdfPreviewScreen(
     viewModel: ImageToPdfViewModel,
-    onNavigateToHome: () -> Unit,
+    onNavigateToResult: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -33,13 +30,10 @@ fun ImageToPdfPreviewScreen(
     var fileName by remember { mutableStateOf("document.pdf") }
     var selectedPageSize by remember { mutableStateOf(pdfSettings.pageSize) }
     var selectedMargin by remember { mutableStateOf(pdfSettings.margins) }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var createdPdfUri by remember { mutableStateOf<Uri?>(null) }
     
     LaunchedEffect(uiState) {
         if (uiState is ImageToPdfUiState.PdfCreated) {
-            createdPdfUri = (uiState as ImageToPdfUiState.PdfCreated).pdfUri
-            showSuccessDialog = true
+            onNavigateToResult()
         }
     }
     
@@ -183,18 +177,6 @@ fun ImageToPdfPreviewScreen(
                 ErrorDialog(
                     message = error,
                     onDismiss = { viewModel.reset() }
-                )
-            }
-            
-            if (showSuccessDialog && createdPdfUri != null) {
-                SuccessDialog(
-                    title = "PDF Created",
-                    message = "Your PDF has been created successfully!",
-                    onDismiss = {
-                        showSuccessDialog = false
-                        viewModel.reset()
-                        onNavigateToHome()
-                    }
                 )
             }
 
