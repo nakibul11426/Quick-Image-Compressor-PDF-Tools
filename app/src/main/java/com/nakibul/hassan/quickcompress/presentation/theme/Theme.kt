@@ -13,32 +13,78 @@ import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryBlue,
-    onPrimary = SurfaceLight,
+    onPrimary = Color.White,
     primaryContainer = PrimaryBlueLight,
-    onPrimaryContainer = TextPrimary,
-    secondary = SecondaryColor,
-    onSecondary = SurfaceLight,
+    onPrimaryContainer = PrimaryBlueDark,
+    
+    secondary = SecondaryTeal,
+    onSecondary = Color.White,
+    secondaryContainer = SecondaryTealLight,
+    onSecondaryContainer = Color(0xFF00363A),
+    
+    tertiary = AccentPurple,
+    onTertiary = Color.White,
+    tertiaryContainer = Color(0xFFEDE7F6),
+    onTertiaryContainer = Color(0xFF311B92),
+    
     background = BackgroundLight,
     onBackground = TextPrimary,
+    
     surface = SurfaceLight,
     onSurface = TextPrimary,
+    surfaceVariant = SurfaceElevated,
+    onSurfaceVariant = TextSecondary,
+    
+    surfaceTint = PrimaryBlue,
+    inverseSurface = Color(0xFF2E2E2E),
+    inverseOnSurface = Color(0xFFF4F4F4),
+    
     error = ErrorRed,
-    onError = SurfaceLight
+    onError = Color.White,
+    errorContainer = ErrorRedLight,
+    onErrorContainer = Color(0xFF5F0000),
+    
+    outline = Color(0xFFBDBDBD),
+    outlineVariant = Color(0xFFE0E0E0),
+    scrim = ScrimLight
 )
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryBlueLight,
-    onPrimary = TextPrimary,
+    onPrimary = Color(0xFF003258),
     primaryContainer = PrimaryBlueDark,
-    onPrimaryContainer = SurfaceLight,
-    secondary = SecondaryColor,
-    onSecondary = TextPrimary,
-    background = Color(0xFF121212),
-    onBackground = SurfaceLight,
-    surface = Color(0xFF1E1E1E),
-    onSurface = SurfaceLight,
-    error = ErrorRed,
-    onError = SurfaceLight
+    onPrimaryContainer = Color(0xFFD1E4FF),
+    
+    secondary = SecondaryTealLight,
+    onSecondary = Color(0xFF00363A),
+    secondaryContainer = Color(0xFF004F58),
+    onSecondaryContainer = Color(0xFFB2EBF2),
+    
+    tertiary = Color(0xFFB39DDB),
+    onTertiary = Color(0xFF311B92),
+    tertiaryContainer = Color(0xFF4527A0),
+    onTertiaryContainer = Color(0xFFD1C4E9),
+    
+    background = BackgroundDark,
+    onBackground = Color(0xFFE6E6E6),
+    
+    surface = SurfaceDark,
+    onSurface = Color(0xFFE6E6E6),
+    surfaceVariant = SurfaceElevatedDark,
+    onSurfaceVariant = Color(0xFFCDCDCD),
+    
+    surfaceTint = PrimaryBlueLight,
+    inverseSurface = Color(0xFFE6E6E6),
+    inverseOnSurface = Color(0xFF1A1A1A),
+    
+    error = ErrorRedLight,
+    onError = Color(0xFF690005),
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6),
+    
+    outline = Color(0xFF8E8E8E),
+    outlineVariant = Color(0xFF444444),
+    scrim = ScrimDark
 )
 
 @Composable

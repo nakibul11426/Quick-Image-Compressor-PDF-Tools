@@ -47,41 +47,46 @@ private fun ImageThumbnailItem(
     onRemove: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-    ) {
-        AsyncImage(
-            model = imageUri,
-            contentDescription = "Image thumbnail",
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
-                    MaterialTheme.colorScheme.surfaceVariant,
-                    MaterialTheme.shapes.medium
-                ),
-            contentScale = ContentScale.Crop
+    Card(
+        modifier = modifier.aspectRatio(1f),
+        shape = MaterialTheme.shapes.large,
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 2.dp
         )
-        
-        if (onRemove != null) {
-            IconButton(
-                onClick = onRemove,
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            AsyncImage(
+                model = imageUri,
+                contentDescription = "Image thumbnail",
                 modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .size(32.dp)
-                    .padding(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Remove",
-                    tint = MaterialTheme.colorScheme.error,
+                    .fillMaxSize()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        MaterialTheme.shapes.large
+                    ),
+                contentScale = ContentScale.Crop
+            )
+            
+            if (onRemove != null) {
+                IconButton(
+                    onClick = onRemove,
                     modifier = Modifier
-                        .background(
-                            MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-                            MaterialTheme.shapes.small
-                        )
-                        .padding(4.dp)
-                )
+                        .align(Alignment.TopEnd)
+                        .padding(6.dp)
+                        .size(32.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Remove",
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
         }
     }
