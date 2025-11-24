@@ -72,39 +72,21 @@ class PdfSplitViewModel @Inject constructor(
                     return@launch
                 }
                 
-                val pageRanges = convertToRanges(selectedPages.map { it.pageNumber - 1 })
+                // Create individual page ranges - each page becomes a separate PDF
+                val pageRanges = selectedPages.map { page ->
+                    val pageIndex = page.pageNumber - 1
+                    pageIndex..pageIndex
+                }
                 
                 val pdfUri = _selectedPdf.value?.uri ?: throw IllegalStateException("No PDF selected")
                 val splitUris = splitPdfUseCase(pdfUri, pageRanges, outputFilePrefix)
                 
-                _uiState.value = PdfSplitUiState.SplitComplete(splitUris)
+                _uiState.value = PdfSplitUiState.SplitComplete(splitUris, selectedPages.size)
             } catch (e: Exception) {
                 Timber.e(e, "Error splitting PDF")
                 _uiState.value = PdfSplitUiState.Error(e.message ?: "Failed to split PDF")
             }
         }
-    }
-    
-    private fun convertToRanges(pageNumbers: List<Int>): List<IntRange> {
-        if (pageNumbers.isEmpty()) return emptyList()
-        
-        val sorted = pageNumbers.sorted()
-        val ranges = mutableListOf<IntRange>()
-        var rangeStart = sorted.first()
-        var rangeEnd = sorted.first()
-        
-        for (i in 1 until sorted.size) {
-            if (sorted[i] == rangeEnd + 1) {
-                rangeEnd = sorted[i]
-            } else {
-                ranges.add(rangeStart..rangeEnd)
-                rangeStart = sorted[i]
-                rangeEnd = sorted[i]
-            }
-        }
-        ranges.add(rangeStart..rangeEnd)
-        
-        return ranges
     }
     
     fun reset() {
@@ -119,6 +101,6 @@ sealed class PdfSplitUiState {
     object Loading : PdfSplitUiState()
     data class PdfLoaded(val pdf: PdfDocument, val pages: List<PdfPage>) : PdfSplitUiState()
     object Splitting : PdfSplitUiState()
-    data class SplitComplete(val splitPdfUris: List<Uri>) : PdfSplitUiState()
+    data class SplitComplete(val splitPdfUris: List<Uri>, val pageCount: Int) : PdfSplitUiState()
     data class Error(val message: String) : PdfSplitUiState()
 }

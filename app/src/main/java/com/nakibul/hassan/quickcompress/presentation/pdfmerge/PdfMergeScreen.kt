@@ -15,26 +15,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.nakibul.hassan.quickcompress.presentation.components.ErrorDialog
-import com.nakibul.hassan.quickcompress.presentation.components.FileInfoRow
 import com.nakibul.hassan.quickcompress.presentation.components.LoadingDialog
 import com.nakibul.hassan.quickcompress.presentation.components.PrimaryButton
 import com.nakibul.hassan.quickcompress.presentation.components.RoundedCard
 import com.nakibul.hassan.quickcompress.presentation.components.SecondaryButton
-import com.nakibul.hassan.quickcompress.presentation.components.SuccessDialog
 import com.nakibul.hassan.quickcompress.presentation.components.TopBar
+import com.nakibul.hassan.quickcompress.utils.FileUtils
 
 @Composable
 fun PdfMergeScreen(
     viewModel: PdfMergeViewModel = hiltViewModel(),
-    onNavigateToHome: () -> Unit,
+    onNavigateToResult: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val selectedPdfs by viewModel.selectedPdfs.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     
     var fileName by remember { mutableStateOf("merged.pdf") }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var mergedPdfUri by remember { mutableStateOf<Uri?>(null) }
     
     val pdfPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
@@ -46,8 +43,7 @@ fun PdfMergeScreen(
     
     LaunchedEffect(uiState) {
         if (uiState is PdfMergeUiState.MergeComplete) {
-            mergedPdfUri = (uiState as PdfMergeUiState.MergeComplete).mergedPdfUri
-            showSuccessDialog = true
+            onNavigateToResult()
         }
     }
     
@@ -81,18 +77,6 @@ fun PdfMergeScreen(
                 else -> {
                     // Show content
                 }
-            }
-            
-            if (showSuccessDialog && mergedPdfUri != null) {
-                SuccessDialog(
-                    title = "PDFs Merged",
-                    message = "Your PDFs have been merged successfully!",
-                    onDismiss = {
-                        showSuccessDialog = false
-                        viewModel.reset()
-                        onNavigateToHome()
-                    }
-                )
             }
             
             Column(
@@ -173,11 +157,42 @@ fun PdfMergeScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(selectedPdfs, key = { it.uri.toString() }) { pdf ->
-                            FileInfoRow(
-                                fileName = pdf.name,
-                                fileSize = pdf.size,
-                                additionalInfo = "${pdf.pageCount} pages"
-                            )
+                            RoundedCard {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Description,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(40.dp)
+                                    )
+                                    
+                                    Column(
+                                        modifier = Modifier.weight(1f)
+                                    ) {
+                                        Text(
+                                            text = pdf.name,
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            maxLines = 1
+                                        )
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                        Text(
+                                            text = FileUtils.formatFileSize(pdf.size),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                                        )
+                                        Text(
+                                            text = "${pdf.pageCount} pages",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }

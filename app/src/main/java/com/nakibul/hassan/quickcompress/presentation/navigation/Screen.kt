@@ -12,6 +12,8 @@ sealed class Screen(val route: String) {
     object ImageToPdfResult : Screen("imagetopdf/result")
     
     object PdfMerge : Screen("pdfmerge")
+    object PdfMergeResult : Screen("pdfmerge/result")
     
     object PdfSplit : Screen("pdfsplit")
+    object PdfSplitResult : Screen("pdfsplit/result")
 }

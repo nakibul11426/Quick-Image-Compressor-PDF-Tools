@@ -14,7 +14,9 @@ import com.nakibul.hassan.quickcompress.presentation.imagetopdf.ImageToPdfPicker
 import com.nakibul.hassan.quickcompress.presentation.imagetopdf.ImageToPdfPreviewScreen
 import com.nakibul.hassan.quickcompress.presentation.imagetopdf.PdfResultScreen
 import com.nakibul.hassan.quickcompress.presentation.pdfmerge.PdfMergeScreen
+import com.nakibul.hassan.quickcompress.presentation.pdfmerge.PdfMergeResultScreen
 import com.nakibul.hassan.quickcompress.presentation.pdfsplit.PdfSplitScreen
+import com.nakibul.hassan.quickcompress.presentation.pdfsplit.PdfSplitResultScreen
 
 @Composable
 fun AppNavigation(
@@ -137,12 +139,14 @@ fun AppNavigation(
         }
         
         // PDF Merge
-        composable(Screen.PdfMerge.route) {
+        composable(Screen.PdfMerge.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.PdfMerge.route)
+            }
             PdfMergeScreen(
-                onNavigateToHome = {
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Home.route) { inclusive = true }
-                    }
+                viewModel = hiltViewModel(parentEntry),
+                onNavigateToResult = {
+                    navController.navigate(Screen.PdfMergeResult.route)
                 },
                 onNavigateBack = {
                     navController.popBackStack()
@@ -150,16 +154,46 @@ fun AppNavigation(
             )
         }
         
-        // PDF Split
-        composable(Screen.PdfSplit.route) {
-            PdfSplitScreen(
+        composable(Screen.PdfMergeResult.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.PdfMerge.route)
+            }
+            PdfMergeResultScreen(
+                viewModel = hiltViewModel(parentEntry),
                 onNavigateToHome = {
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Home.route) { inclusive = true }
                     }
+                }
+            )
+        }
+        
+        // PDF Split
+        composable(Screen.PdfSplit.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.PdfSplit.route)
+            }
+            PdfSplitScreen(
+                viewModel = hiltViewModel(parentEntry),
+                onNavigateToResult = {
+                    navController.navigate(Screen.PdfSplitResult.route)
                 },
                 onNavigateBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(Screen.PdfSplitResult.route) { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(Screen.PdfSplit.route)
+            }
+            PdfSplitResultScreen(
+                viewModel = hiltViewModel(parentEntry),
+                onNavigateToHome = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
                 }
             )
         }

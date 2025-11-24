@@ -28,9 +28,11 @@ class PdfMergeViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _uiState.value = PdfMergeUiState.Loading
-                val pdfs = getPdfDetailsUseCase(uris)
-                _selectedPdfs.value = pdfs
-                _uiState.value = PdfMergeUiState.PdfsSelected(pdfs)
+                val newPdfs = getPdfDetailsUseCase(uris)
+                val currentPdfs = _selectedPdfs.value.toMutableList()
+                currentPdfs.addAll(newPdfs)
+                _selectedPdfs.value = currentPdfs
+                _uiState.value = PdfMergeUiState.PdfsSelected(currentPdfs)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading PDFs")
                 _uiState.value = PdfMergeUiState.Error(e.message ?: "Failed to load PDFs")

@@ -32,7 +32,7 @@ import com.nakibul.hassan.quickcompress.presentation.components.TopBar
 @Composable
 fun PdfSplitScreen(
     viewModel: PdfSplitViewModel = hiltViewModel(),
-    onNavigateToHome: () -> Unit,
+    onNavigateToResult: () -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val selectedPdf by viewModel.selectedPdf.collectAsState()
@@ -40,8 +40,6 @@ fun PdfSplitScreen(
     val uiState by viewModel.uiState.collectAsState()
     
     var fileName by remember { mutableStateOf("split") }
-    var showSuccessDialog by remember { mutableStateOf(false) }
-    var splitPdfUris by remember { mutableStateOf<List<Uri>>(emptyList()) }
     
     val pdfPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -51,8 +49,7 @@ fun PdfSplitScreen(
     
     LaunchedEffect(uiState) {
         if (uiState is PdfSplitUiState.SplitComplete) {
-            splitPdfUris = (uiState as PdfSplitUiState.SplitComplete).splitPdfUris
-            showSuccessDialog = true
+            onNavigateToResult()
         }
     }
     
@@ -86,18 +83,6 @@ fun PdfSplitScreen(
                 else -> {
                     // Show content
                 }
-            }
-            
-            if (showSuccessDialog) {
-                SuccessDialog(
-                    title = "PDF Split",
-                    message = "Your PDF has been split into ${splitPdfUris.size} file(s) successfully!",
-                    onDismiss = {
-                        showSuccessDialog = false
-                        viewModel.reset()
-                        onNavigateToHome()
-                    }
-                )
             }
             
             Column(
