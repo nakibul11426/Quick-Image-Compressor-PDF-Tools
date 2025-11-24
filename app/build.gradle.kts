@@ -72,6 +72,9 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.permissions)
     
+    // DataStore
+    implementation(libs.androidx.datastore.preferences)
+    
     // ExifInterface for image rotation
     implementation("androidx.exifinterface:exifinterface:1.3.7")
     

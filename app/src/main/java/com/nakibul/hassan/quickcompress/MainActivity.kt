@@ -11,11 +11,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.nakibul.hassan.quickcompress.presentation.navigation.AppNavigation
 import com.nakibul.hassan.quickcompress.presentation.theme.QuickCompressTheme
+import com.nakibul.hassan.quickcompress.presentation.theme.ThemeViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -35,13 +39,20 @@ class MainActivity : ComponentActivity() {
         requestStoragePermissions()
         
         setContent {
-            QuickCompressTheme {
+            val themeViewModel: ThemeViewModel = hiltViewModel()
+            val isDarkMode by themeViewModel.isDarkMode.collectAsState()
+            
+            QuickCompressTheme(darkTheme = isDarkMode) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    AppNavigation(navController = navController)
+                    AppNavigation(
+                        navController = navController,
+                        isDarkMode = isDarkMode,
+                        onToggleTheme = { themeViewModel.toggleTheme() }
+                    )
                 }
             }
         }

@@ -17,7 +17,11 @@ import com.nakibul.hassan.quickcompress.presentation.pdfmerge.PdfMergeScreen
 import com.nakibul.hassan.quickcompress.presentation.pdfsplit.PdfSplitScreen
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
+fun AppNavigation(
+    navController: NavHostController,
+    isDarkMode: Boolean,
+    onToggleTheme: () -> Unit
+) {
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route
@@ -36,7 +40,9 @@ fun AppNavigation(navController: NavHostController) {
                 },
                 onNavigateToPdfSplit = {
                     navController.navigate(Screen.PdfSplit.route)
-                }
+                },
+                isDarkMode = isDarkMode,
+                onToggleTheme = onToggleTheme
             )
         }
         
