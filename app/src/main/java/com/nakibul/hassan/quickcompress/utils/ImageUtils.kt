@@ -23,6 +23,22 @@ object ImageUtils {
         return try {
             Timber.d("compressImage: Processing $imageUri with quality=$quality, resizeOption=$resizeOption")
             
+            // Read EXIF orientation first
+            val exifOrientation = try {
+                context.contentResolver.openInputStream(imageUri)?.use { stream ->
+                    val exif = ExifInterface(stream)
+                    exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.w(e, "Failed to read EXIF orientation")
+                ExifInterface.ORIENTATION_UNDEFINED
+            } ?: ExifInterface.ORIENTATION_UNDEFINED
+            
+            Timber.d("compressImage: EXIF orientation: $exifOrientation")
+            
             // First pass: Get original dimensions
             var originalWidth = 0
             var originalHeight = 0
@@ -69,17 +85,24 @@ object ImageUtils {
             
             Timber.d("compressImage: Decoded bitmap size: ${bitmap.width}x${bitmap.height}")
             
+            // Apply EXIF orientation correction
+            val orientedBitmap = rotateBitmap(bitmap, exifOrientation)
+            if (orientedBitmap !== bitmap) {
+                Timber.d("compressImage: Applied orientation correction, new size: ${orientedBitmap.width}x${orientedBitmap.height}")
+                bitmap.recycle()
+            }
+            
             // Further resize if needed to exact dimensions
             val resizedBitmap = if (resizeOption != ResizeOption.ORIGINAL &&
-                (bitmap.width != targetWidth || bitmap.height != targetHeight)) {
+                (orientedBitmap.width != targetWidth || orientedBitmap.height != targetHeight)) {
                 Timber.d("compressImage: Fine-tuning size to ${targetWidth}x${targetHeight}")
-                val scaled = resizeBitmap(bitmap, resizeOption)
-                if (scaled !== bitmap) {
-                    bitmap.recycle()
+                val scaled = resizeBitmap(orientedBitmap, resizeOption)
+                if (scaled !== orientedBitmap) {
+                    orientedBitmap.recycle()
                 }
                 scaled
             } else {
-                bitmap
+                orientedBitmap
             }
             
             Timber.d("compressImage: Final bitmap size: ${resizedBitmap.width}x${resizedBitmap.height}")
@@ -169,6 +192,22 @@ object ImageUtils {
         return try {
             Timber.d("getBitmapFromUri: Loading $uri")
             
+            // Read EXIF orientation first
+            val exifOrientation = try {
+                context.contentResolver.openInputStream(uri)?.use { stream ->
+                    val exif = ExifInterface(stream)
+                    exif.getAttributeInt(
+                        ExifInterface.TAG_ORIENTATION,
+                        ExifInterface.ORIENTATION_UNDEFINED
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.w(e, "Failed to read EXIF orientation")
+                ExifInterface.ORIENTATION_UNDEFINED
+            } ?: ExifInterface.ORIENTATION_UNDEFINED
+            
+            Timber.d("getBitmapFromUri: EXIF orientation: $exifOrientation")
+            
             // First pass: Get dimensions without loading full image
             var width = 0
             var height = 0
@@ -210,8 +249,17 @@ object ImageUtils {
                 return null
             }
             
-            Timber.d("getBitmapFromUri: Successfully loaded bitmap ${bitmap.width}x${bitmap.height}")
-            bitmap
+            Timber.d("getBitmapFromUri: Decoded bitmap ${bitmap.width}x${bitmap.height}")
+            
+            // Apply EXIF orientation correction
+            val orientedBitmap = rotateBitmap(bitmap, exifOrientation)
+            if (orientedBitmap !== bitmap) {
+                Timber.d("getBitmapFromUri: Applied orientation correction, new size: ${orientedBitmap.width}x${orientedBitmap.height}")
+                bitmap.recycle()
+            }
+            
+            Timber.d("getBitmapFromUri: Successfully loaded bitmap ${orientedBitmap.width}x${orientedBitmap.height}")
+            orientedBitmap
         } catch (e: Exception) {
             Timber.e(e, "Error loading bitmap from URI: $uri")
             null
