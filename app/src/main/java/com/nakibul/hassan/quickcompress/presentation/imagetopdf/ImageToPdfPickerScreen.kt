@@ -46,7 +46,7 @@ fun ImageToPdfPickerScreen(
     Scaffold(
         topBar = {
             TopBar(
-                title = "Select Images for PDF",
+                title = "Select Images",
                 onNavigationClick = onNavigateBack
             )
         }

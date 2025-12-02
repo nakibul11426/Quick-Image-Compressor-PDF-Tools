@@ -14,38 +14,38 @@ import androidx.compose.ui.platform.LocalContext
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryBlue,
     onPrimary = Color.White,
-    primaryContainer = PrimaryBlueLight,
-    onPrimaryContainer = PrimaryBlueDark,
+    primaryContainer = Color(0xFFE3F2FD),
+    onPrimaryContainer = Color(0xFF001D36),
     
     secondary = SecondaryTeal,
     onSecondary = Color.White,
-    secondaryContainer = SecondaryTealLight,
-    onSecondaryContainer = Color(0xFF00363A),
+    secondaryContainer = Color(0xFFE0F7FA),
+    onSecondaryContainer = Color(0xFF00363D),
     
     tertiary = AccentPurple,
     onTertiary = Color.White,
-    tertiaryContainer = Color(0xFFEDE7F6),
-    onTertiaryContainer = Color(0xFF311B92),
+    tertiaryContainer = Color(0xFFF3E5F5),
+    onTertiaryContainer = Color(0xFF21005D),
     
     background = BackgroundLight,
     onBackground = TextPrimary,
     
     surface = SurfaceLight,
     onSurface = TextPrimary,
-    surfaceVariant = SurfaceElevated,
+    surfaceVariant = Color(0xFFF1F3F4),
     onSurfaceVariant = TextSecondary,
     
     surfaceTint = PrimaryBlue,
-    inverseSurface = Color(0xFF2E2E2E),
-    inverseOnSurface = Color(0xFFF4F4F4),
+    inverseSurface = Color(0xFF2E3135),
+    inverseOnSurface = Color(0xFFF1F3F4),
     
     error = ErrorRed,
     onError = Color.White,
-    errorContainer = ErrorRedLight,
-    onErrorContainer = Color(0xFF5F0000),
+    errorContainer = Color(0xFFFFEDEA),
+    onErrorContainer = Color(0xFF690005),
     
-    outline = Color(0xFFBDBDBD),
-    outlineVariant = Color(0xFFE0E0E0),
+    outline = Color(0xFFDADCE0),
+    outlineVariant = Color(0xFFE8EAED),
     scrim = ScrimLight
 )
 

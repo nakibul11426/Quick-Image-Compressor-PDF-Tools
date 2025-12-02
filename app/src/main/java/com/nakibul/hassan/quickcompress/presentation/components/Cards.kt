@@ -50,8 +50,8 @@ fun RoundedCard(
                 containerColor = MaterialTheme.colorScheme.surface
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 2.dp,
-                pressedElevation = 6.dp
+                defaultElevation = if (isDarkTheme) 2.dp else 4.dp,
+                pressedElevation = if (isDarkTheme) 6.dp else 8.dp
             )
         ) {
             Column(
@@ -70,7 +70,7 @@ fun RoundedCard(
                 containerColor = MaterialTheme.colorScheme.surface
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 2.dp
+                defaultElevation = if (isDarkTheme) 2.dp else 4.dp
             )
         ) {
             Column(

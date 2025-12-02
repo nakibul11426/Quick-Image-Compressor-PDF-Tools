@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -39,7 +40,7 @@ fun HomeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Quick Image Compressor & PDF Tools") },
+                title = { Text("Image Compressor & PDF Tools") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
@@ -179,6 +180,7 @@ fun CompactToolCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
     var pressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (pressed) 0.95f else 1f,
@@ -189,6 +191,16 @@ fun CompactToolCard(
         label = "scale"
     )
     
+    val borderModifier = if (!isDarkTheme) {
+        Modifier.border(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+            shape = MaterialTheme.shapes.extraLarge
+        )
+    } else {
+        Modifier
+    }
+    
     Card(
         onClick = {
             pressed = true
@@ -196,14 +208,15 @@ fun CompactToolCard(
         },
         modifier = modifier
             .aspectRatio(1f)
-            .scale(scale),
+            .scale(scale)
+            .then(borderModifier),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 3.dp,
-            pressedElevation = 8.dp
+            defaultElevation = if (isDarkTheme) 3.dp else 6.dp,
+            pressedElevation = if (isDarkTheme) 8.dp else 12.dp
         )
     ) {
         Column(
@@ -221,8 +234,8 @@ fun CompactToolCard(
                     .background(
                         brush = Brush.linearGradient(
                             colors = listOf(
-                                PrimaryBlueLight.copy(alpha = 0.2f),
-                                PrimaryBlue.copy(alpha = 0.15f)
+                                MaterialTheme.colorScheme.primaryContainer,
+                                MaterialTheme.colorScheme.secondaryContainer
                             )
                         )
                     ),
